@@ -1,0 +1,35 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-3.0.x", "rhel-openssl-1.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Event {
+  id           String        @id @default(uuid())
+  organizer    String
+  name         String        @db.VarChar(255)
+  desc         String
+  dateFrom     DateTime
+  dateTo       DateTime
+  createAt     DateTime      @default(now())
+  updateAt     DateTime      @updatedAt
+  participants Participant[]
+}
+
+model Participant {
+  name      String
+  studentId String
+  faculty   String
+
+  Event   Event  @relation(fields: [eventId], references: [id])
+  eventId String
+
+  @@id(name: "participantId", [studentId, eventId])
+}
